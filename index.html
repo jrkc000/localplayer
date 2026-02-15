@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Watch Party</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="app-container">
+
+  <div id="loginScreen">
+    <h1>🍿 Movie Night</h1>
+    <input id="roomInput" placeholder="Room Name">
+    <button id="joinBtn">Join Room</button>
+  </div>
+
+  <div id="playerScreen" class="hidden main-layout">
+
+    <div class="video-section">
+      <div class="video-wrapper">
+        <video id="videoPlayer" controls playsinline></video>
+
+        <div id="uploadOverlay" class="overlay">
+          <label class="btn-primary">
+            Choose Video
+            <input type="file" id="fileInput" accept="video/*">
+          </label>
+        </div>
+
+        <div id="readyOverlay" class="overlay hidden">
+          <button id="readyBtn" class="btn-success">I'm Ready</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-section">
+      <div class="chat-header">💬 Chat</div>
+      <div id="chatHistory" class="chat-history"></div>
+      <div class="chat-input-area">
+        <div id="chatInput" contenteditable="true" placeholder="Type message…"></div>
+        <button id="sendBtn">➤</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
