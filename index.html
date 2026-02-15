@@ -5,18 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-    <title>Date Night Sync</title>
+    <title>Date Night</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
     <div id="loginScreen" class="screen active">
-        <div class="glass-panel">
-            <h1 class="title">DATE<span>NIGHT</span></h1>
-            <p class="subtitle">Private Cinema for Two</p>
-            <div class="input-zone">
+        <div class="glass-card">
+            <h1 class="logo">DATE<span>NIGHT</span></h1>
+            <p class="tagline">Private Cinema Sync</p>
+
+            <div class="login-form">
                 <input id="roomInput" type="text" placeholder="Create Room Name..." autocomplete="off">
                 <button id="joinBtn">ENTER ROOM</button>
             </div>
@@ -24,45 +25,44 @@
     </div>
 
     <div id="playerScreen" class="screen hidden">
-        <div id="heartsContainer"></div>
 
-        <section class="video-area">
+        <div class="video-container">
             <div class="video-wrapper">
                 <video id="videoPlayer" controls playsinline></video>
 
                 <div id="uploadOverlay" class="overlay">
-                    <div class="overlay-content">
+                    <div class="center-content">
                         <h2>Select Movie</h2>
-                        <p>Pick a local file to start</p>
-                        <label class="glow-btn">
-                            BROWSE FILES
+                        <label class="btn-primary">
+                            CHOOSE FILE
                             <input type="file" id="fileInput" accept="video/*">
                         </label>
                     </div>
                 </div>
             </div>
 
-            <div class="status-bar">
-                <span id="roomNameDisplay">ROOM: --</span>
-                <span id="partnerStatus" class="status-pill offline">💔 WAITING FOR PARTNER</span>
+            <div class="info-bar">
+                <div id="roomNameDisplay" class="badge">ROOM: --</div>
+                <div id="partnerStatus" class="badge offline">💔 WAITING...</div>
             </div>
-        </section>
+        </div>
 
-        <section class="chat-area">
-            <div class="chat-header">
-                <span>WHISPER CHAT</span>
-                <button id="heartBtn" class="icon-btn">💞</button>
+        <div class="chat-container">
+            <div class="emoji-header">
+                <button class="emoji-btn" onclick="triggerEmoji('😘')">😘</button>
+                <button class="emoji-btn" onclick="triggerEmoji('💞')">💞</button>
+                <button class="emoji-btn" onclick="triggerEmoji('🫂')">🫂</button>
+                <button class="emoji-btn" onclick="triggerEmoji('✨')">✨</button>
+                <button class="emoji-btn" onclick="triggerEmoji('🥳')">🥳</button>
             </div>
 
-            <div id="chatHistory" class="chat-history">
-                <div class="system-msg">Welcome to the room.</div>
-            </div>
+            <div id="chatHistory" class="messages-area"></div>
 
-            <div class="chat-input-wrapper">
-                <input type="text" id="chatInput" placeholder="Say something..." autocomplete="off">
-                <button id="sendBtn">SEND</button>
+            <div class="input-area">
+                <input type="text" id="chatInput" placeholder="Whisper something..." autocomplete="off">
+                <button id="sendBtn">➤</button>
             </div>
-        </section>
+        </div>
     </div>
 
     <script src="app.js"></script>
