@@ -16,7 +16,6 @@
         <div class="glass-card">
             <h1 class="logo">DATE<span>NIGHT</span></h1>
             <p class="tagline">Private Cinema Sync</p>
-
             <div class="login-form">
                 <input id="roomInput" type="text" placeholder="Create Room Name..." autocomplete="off">
                 <button id="joinBtn">ENTER ROOM</button>
@@ -25,11 +24,9 @@
     </div>
 
     <div id="playerScreen" class="screen hidden">
-
         <div class="video-container">
             <div class="video-wrapper">
                 <video id="videoPlayer" controls playsinline></video>
-
                 <div id="uploadOverlay" class="overlay">
                     <div class="center-content">
                         <h2>Select Movie</h2>
@@ -40,7 +37,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="info-bar">
                 <div id="roomNameDisplay" class="badge">ROOM: --</div>
                 <div id="partnerStatus" class="badge offline">💔 WAITING...</div>
@@ -57,6 +53,10 @@
             </div>
 
             <div id="chatHistory" class="messages-area"></div>
+
+            <div id="typingIndicator" class="typing-indicator hidden">
+                <span>•</span><span>•</span><span>•</span>
+            </div>
 
             <div class="input-area">
                 <input type="text" id="chatInput" placeholder="Whisper something..." autocomplete="off">
