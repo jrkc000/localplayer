@@ -7,6 +7,7 @@ const video = document.getElementById("videoPlayer");
 const chatInput = document.getElementById("chatInput");
 const chatHistory = document.getElementById("chatHistory");
 const partnerStatus = document.getElementById("partnerStatus");
+const uploadOverlay = document.getElementById("uploadOverlay");
 
 let myId, remoteAction = false;
 
@@ -24,24 +25,22 @@ socket.onmessage = e => {
 
     if (msg.type === "SYNC") {
         remoteAction = true;
-        // Sync time only if drift is > 1.2 seconds
         if (Math.abs(video.currentTime - msg.currentTime) > 1.2) {
             video.currentTime = msg.currentTime;
         }
-
-        if (msg.isPlaying && video.paused) {
-            video.play().catch(() => { });
-        } else if (!msg.isPlaying && !video.paused) {
-            video.pause();
-        }
-
-        // Short delay to allow the browser to register the state change
+        msg.isPlaying ? video.play().catch(() => { }) : video.pause();
         setTimeout(() => { remoteAction = false; }, 600);
     }
 
-    if (msg.type === "CHAT") renderChat(msg);
+    if (msg.type === "CHAT") {
+        // Only render if it's from the other person (we already echoed ours)
+        if (msg.senderId !== myId) {
+            renderChat(msg.text, false);
+        }
+    }
 };
 
+// LOGIN LOGIC
 document.getElementById("joinBtn").onclick = () => {
     const room = document.getElementById("roomInput").value.trim().toUpperCase();
     if (!room) return;
@@ -51,15 +50,16 @@ document.getElementById("joinBtn").onclick = () => {
     document.getElementById("playerScreen").classList.remove("hidden");
 };
 
+// VIDEO UPLOAD LOGIC
 document.getElementById("fileInput").onchange = e => {
     const file = e.target.files[0];
     if (file) {
         video.src = URL.createObjectURL(file);
-        document.getElementById("uploadOverlay").classList.add("hidden");
+        uploadOverlay.classList.add("hidden");
     }
 };
 
-// BROADCAST SYNC
+// VIDEO SYNC
 ["play", "pause", "seeking"].forEach(ev => {
     video.addEventListener(ev, () => {
         if (!remoteAction) {
@@ -72,20 +72,30 @@ document.getElementById("fileInput").onchange = e => {
     });
 });
 
-// CHAT
+// MESSENGER CHAT LOGIC
 const sendChat = () => {
     const text = chatInput.value.trim();
     if (!text) return;
-    socket.send(JSON.stringify({ type: "CHAT", text }));
+
+    // Show my own text locally immediately
+    renderChat(text, true);
+
+    // Send to partner
+    socket.send(JSON.stringify({ type: "CHAT", text, senderId: myId }));
     chatInput.value = "";
 };
+
+function renderChat(text, isMe) {
+    const div = document.createElement("div");
+    div.className = `message ${isMe ? "sent" : "received"}`;
+    div.textContent = text;
+    chatHistory.appendChild(div);
+
+    // Always scroll to bottom
+    setTimeout(() => {
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }, 50);
+}
+
 document.getElementById("sendBtn").onclick = sendChat;
 chatInput.onkeydown = e => { if (e.key === "Enter") sendChat(); };
-
-function renderChat(msg) {
-    const div = document.createElement("div");
-    div.className = `message ${msg.senderId === myId ? "sent" : "received"}`;
-    div.textContent = msg.text;
-    chatHistory.appendChild(div);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-}
