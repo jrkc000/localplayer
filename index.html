@@ -4,55 +4,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Watch Party</title>
+    <title>Netflix Party | Sync</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div class="app-container">
+    <div class="netflix-bg"></div>
 
-        <!-- LOGIN -->
-        <div id="loginScreen" class="screen">
-            <h1>🍿 Movie Night</h1>
-            <input id="roomInput" placeholder="Room Name">
+    <div id="loginScreen" class="auth-card">
+        <h1 class="logo">NETFLIX<span>PARTY</span></h1>
+        <div class="input-group">
+            <input id="roomInput" type="text" placeholder="Enter Room Code" spellcheck="false" autocomplete="off">
             <button id="joinBtn">Join Room</button>
         </div>
+        <p class="subtitle">Watch movies together with friends in real-time.</p>
+    </div>
 
-        <!-- PLAYER -->
-        <div id="playerScreen" class="screen hidden">
-            <div class="layout">
+    <div id="playerScreen" class="app-interface hidden">
+        <header class="top-nav">
+            <div class="logo-small">NETFLIX<span>PARTY</span></div>
+            <div class="status-indicators">
+                <span id="roomNameDisplay" class="badge">ROOM: NONE</span>
+                <span id="connectionStatus" class="badge">CONNECTING...</span>
+            </div>
+        </header>
 
-                <!-- VIDEO -->
-                <div class="video-section">
-                    <div class="video-wrapper">
-                        <video id="videoPlayer" controls playsinline></video>
+        <main class="content-grid">
+            <section class="video-container">
+                <div class="video-viewport">
+                    <video id="videoPlayer" playsinline></video>
 
-                        <div id="uploadOverlay" class="overlay">
-                            <label class="btn">
-                                Choose Video
+                    <div id="uploadOverlay" class="cinematic-overlay">
+                        <div class="overlay-content">
+                            <h2>Ready to start?</h2>
+                            <p>Select a video file to share with your group.</p>
+                            <label class="cta-button">
+                                <span>SELECT VIDEO</span>
                                 <input type="file" id="fileInput" accept="video/*">
                             </label>
                         </div>
+                    </div>
 
-                        <div id="readyOverlay" class="overlay hidden">
-                            <button id="readyBtn" class="btn success">I'm Ready</button>
+                    <div id="readyOverlay" class="cinematic-overlay hidden">
+                        <div class="overlay-content">
+                            <h2>Waiting for partner...</h2>
+                            <button id="readyBtn" class="cta-button success">I'M READY</button>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                <!-- CHAT -->
-                <div class="chat-section">
-                    <div class="chat-header">💬 Chat</div>
-                    <div id="chatHistory" class="chat-history"></div>
-                    <div class="chat-input">
-                        <div id="chatInput" contenteditable="true" placeholder="Type message…"></div>
-                        <button id="sendBtn">➤</button>
-                    </div>
+            <aside class="chat-sidebar">
+                <div class="chat-header">LIVE CHAT</div>
+                <div id="chatHistory" class="chat-messages"></div>
+                <div class="chat-footer">
+                    <div id="chatInput" contenteditable="true" placeholder="Send a message..."></div>
+                    <button id="sendBtn">➤</button>
                 </div>
-
-            </div>
-        </div>
-
+            </aside>
+        </main>
     </div>
 
     <script src="app.js"></script>

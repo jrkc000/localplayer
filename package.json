@@ -1,13 +1,13 @@
 {
-  "name": "local-player",
-  "version": "1.0.0",
-  "description": "Watch party with synced video and chat",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "type": "commonjs",
-  "dependencies": {
-    "ws": "^8.19.0"
-  }
+    "name": "local-player",
+    "version": "1.0.0",
+    "description": "Watch party with synced video and chat",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "type": "commonjs",
+    "dependencies": {
+        "ws": "^8.19.0"
+    }
 }
