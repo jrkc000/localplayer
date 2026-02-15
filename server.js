@@ -9,17 +9,10 @@ const server = http.createServer((req, res) => {
     let filePath = req.url === "/" ? "/index.html" : req.url;
     const fullPath = path.join(__dirname, filePath);
     const ext = path.extname(fullPath);
-
-    const types = {
-        ".html": "text/html",
-        ".js": "text/javascript",
-        ".css": "text/css",
-        ".png": "image/png",
-        ".svg": "image/svg+xml"
-    };
+    const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css" };
 
     fs.readFile(fullPath, (err, content) => {
-        if (err) { res.writeHead(404); res.end("File not found"); }
+        if (err) { res.writeHead(404); res.end(); }
         else {
             res.writeHead(200, { "Content-Type": types[ext] || "text/plain" });
             res.end(content);
@@ -40,25 +33,22 @@ wss.on("connection", ws => {
             if (msg.type === "JOIN") {
                 const roomName = msg.roomId;
                 ws.roomId = roomName;
-                if (!rooms[roomName]) rooms[roomName] = { clients: new Set() };
+                rooms[roomName] ??= { clients: new Set() };
                 rooms[roomName].clients.add(ws);
                 ws.send(JSON.stringify({ type: "JOIN_SUCCESS", myId: ws.id }));
                 broadcast(roomName, { type: "PARTNER_UPDATE", count: rooms[roomName].clients.size });
             }
 
-            // ADDED "TYPING" HERE
-            if (["SYNC", "CHAT", "EMOJI", "TYPING"].includes(msg.type)) {
+            if (["SYNC", "CHAT", "EMOJI", "TYPING", "IMAGE"].includes(msg.type)) {
                 broadcast(ws.roomId, { ...msg, senderId: ws.id }, ws);
             }
-
-        } catch (e) { console.error("Invalid message:", e); }
+        } catch (e) { console.error(e); }
     });
 
     ws.on("close", () => {
         if (ws.roomId && rooms[ws.roomId]) {
             rooms[ws.roomId].clients.delete(ws);
             broadcast(ws.roomId, { type: "PARTNER_UPDATE", count: rooms[ws.roomId].clients.size });
-            if (rooms[ws.roomId].clients.size === 0) delete rooms[ws.roomId];
         }
     });
 });
@@ -73,6 +63,4 @@ function broadcast(roomId, data, excludeWs = null) {
     });
 }
 
-server.listen(PORT, "0.0.0.0", () => {
-    console.log(`💘 Date Night Server running at http://localhost:${PORT}`);
-});
+server.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));

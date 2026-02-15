@@ -15,7 +15,6 @@
     <div id="loginScreen" class="screen active">
         <div class="glass-card">
             <h1 class="logo">DATE<span>NIGHT</span></h1>
-            <p class="tagline">Private Cinema Sync</p>
             <div class="login-form">
                 <input id="roomInput" type="text" placeholder="Create Room Name..." autocomplete="off">
                 <button id="joinBtn">ENTER ROOM</button>
@@ -31,15 +30,11 @@
                     <div class="center-content">
                         <h2>Select Movie</h2>
                         <label class="btn-primary">
-                            CHOOSE FILE
+                            CHOOSE VIDEO FILE
                             <input type="file" id="fileInput" accept="video/*">
                         </label>
                     </div>
                 </div>
-            </div>
-            <div class="info-bar">
-                <div id="roomNameDisplay" class="badge">ROOM: --</div>
-                <div id="partnerStatus" class="badge offline">💔 WAITING...</div>
             </div>
         </div>
 
@@ -53,14 +48,28 @@
             </div>
 
             <div id="chatHistory" class="messages-area"></div>
-
-            <div id="typingIndicator" class="typing-indicator hidden">
-                <span>•</span><span>•</span><span>•</span>
-            </div>
+            <div id="typingIndicator" class="typing-indicator hidden"><span>•</span><span>•</span><span>•</span></div>
 
             <div class="input-area">
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+
                 <input type="text" id="chatInput" placeholder="Whisper something..." autocomplete="off">
-                <button id="sendBtn">➤</button>
+
+                <button id="imgBtn" class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+
+                <button id="sendBtn" class="icon-btn hidden">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
