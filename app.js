@@ -3,65 +3,66 @@ const protocol = location.protocol === "https:" ? "wss" : "ws";
 const socketUrl = isLocal ? `${protocol}://${location.hostname}:3000` : `${protocol}://${location.host}`;
 const socket = new WebSocket(socketUrl);
 
+// ELEMENTS
 const video = document.getElementById("videoPlayer");
 const chatInput = document.getElementById("chatInput");
 const chatHistory = document.getElementById("chatHistory");
 const partnerStatus = document.getElementById("partnerStatus");
 const uploadOverlay = document.getElementById("uploadOverlay");
+const heartsContainer = document.getElementById("heartsContainer");
 
-let myId, remoteAction = false;
+let myId;
+let remoteAction = false;
 
-socket.onopen = () => document.getElementById("connectionStatus").innerText = "📡 CONNECTED";
-
+// --- SOCKET LOGIC ---
 socket.onmessage = e => {
     const msg = JSON.parse(e.data);
 
-    if (msg.type === "JOIN_SUCCESS") myId = msg.myId;
+    if (msg.type === "JOIN_SUCCESS") {
+        myId = msg.myId;
+    }
 
     if (msg.type === "PARTNER_UPDATE") {
-        partnerStatus.innerText = msg.count > 1 ? "👤 PARTNER IN" : "👤 WAITING...";
-        partnerStatus.style.color = msg.count > 1 ? "#22c55e" : "#888";
+        const isPartnerHere = msg.count > 1;
+        partnerStatus.innerText = isPartnerHere ? "❤️ PARTNER CONNECTED" : "💔 WAITING FOR PARTNER";
+        partnerStatus.classList.toggle("online", isPartnerHere);
+        partnerStatus.classList.toggle("offline", !isPartnerHere);
+
+        if (isPartnerHere) addSystemMessage("Partner has joined the room.");
     }
 
     if (msg.type === "SYNC") {
-        remoteAction = true;
-        if (Math.abs(video.currentTime - msg.currentTime) > 1.2) {
+        // Only apply if the difference is significant to avoid stutter
+        if (Math.abs(video.currentTime - msg.currentTime) > 0.5) {
+            remoteAction = true;
             video.currentTime = msg.currentTime;
         }
-        msg.isPlaying ? video.play().catch(() => { }) : video.pause();
-        setTimeout(() => { remoteAction = false; }, 600);
-    }
 
-    if (msg.type === "CHAT") {
-        // Only render if it's from the other person (we already echoed ours)
-        if (msg.senderId !== myId) {
-            renderChat(msg.text, false);
+        if (msg.isPlaying && video.paused) {
+            remoteAction = true;
+            video.play().catch(() => { });
+        } else if (!msg.isPlaying && !video.paused) {
+            remoteAction = true;
+            video.pause();
         }
+
+        // Reset lock shortly after
+        setTimeout(() => { remoteAction = false; }, 500);
+    }
+
+    if (msg.type === "CHAT" && msg.senderId !== myId) {
+        renderChat(msg.text, "them");
+    }
+
+    if (msg.type === "HEART") {
+        spawnFloatingHeart();
     }
 };
 
-// LOGIN LOGIC
-document.getElementById("joinBtn").onclick = () => {
-    const room = document.getElementById("roomInput").value.trim().toUpperCase();
-    if (!room) return;
-    socket.send(JSON.stringify({ type: "JOIN", roomId: room }));
-    document.getElementById("roomNameDisplay").innerText = `ROOM: ${room}`;
-    document.getElementById("loginScreen").classList.add("hidden");
-    document.getElementById("playerScreen").classList.remove("hidden");
-};
-
-// VIDEO UPLOAD LOGIC
-document.getElementById("fileInput").onchange = e => {
-    const file = e.target.files[0];
-    if (file) {
-        video.src = URL.createObjectURL(file);
-        uploadOverlay.classList.add("hidden");
-    }
-};
-
-// VIDEO SYNC
+// --- VIDEO SYNC LOGIC ---
 ["play", "pause", "seeking"].forEach(ev => {
     video.addEventListener(ev, () => {
+        // If the action was triggered by the user (not by code)
         if (!remoteAction) {
             socket.send(JSON.stringify({
                 type: "SYNC",
@@ -72,30 +73,74 @@ document.getElementById("fileInput").onchange = e => {
     });
 });
 
-// MESSENGER CHAT LOGIC
-const sendChat = () => {
+// --- UI LOGIC ---
+
+// 1. Join Room
+document.getElementById("joinBtn").onclick = () => {
+    const room = document.getElementById("roomInput").value.trim().toUpperCase();
+    if (!room) return;
+    socket.send(JSON.stringify({ type: "JOIN", roomId: room }));
+
+    document.getElementById("roomNameDisplay").innerText = `ROOM: ${room}`;
+    document.getElementById("loginScreen").classList.remove("active");
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("playerScreen").classList.remove("hidden");
+};
+
+// 2. File Upload
+document.getElementById("fileInput").onchange = e => {
+    const file = e.target.files[0];
+    if (file) {
+        video.src = URL.createObjectURL(file);
+        uploadOverlay.classList.add("hidden");
+        addSystemMessage("Video loaded.");
+    }
+};
+
+// 3. Chat System
+function sendChat() {
     const text = chatInput.value.trim();
     if (!text) return;
 
-    // Show my own text locally immediately
-    renderChat(text, true);
-
-    // Send to partner
-    socket.send(JSON.stringify({ type: "CHAT", text, senderId: myId }));
+    renderChat(text, "me");
+    socket.send(JSON.stringify({ type: "CHAT", text }));
     chatInput.value = "";
-};
+}
 
-function renderChat(text, isMe) {
+function renderChat(text, type) {
     const div = document.createElement("div");
-    div.className = `message ${isMe ? "sent" : "received"}`;
-    div.textContent = text;
+    div.className = `msg ${type}`;
+    div.innerText = text;
     chatHistory.appendChild(div);
+    scrollToBottom();
+}
 
-    // Always scroll to bottom
-    setTimeout(() => {
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-    }, 50);
+function addSystemMessage(text) {
+    const div = document.createElement("div");
+    div.className = "system-msg";
+    div.innerText = text;
+    chatHistory.appendChild(div);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    chatHistory.scrollTop = chatHistory.scrollHeight;
 }
 
 document.getElementById("sendBtn").onclick = sendChat;
 chatInput.onkeydown = e => { if (e.key === "Enter") sendChat(); };
+
+// 4. Heart Feature
+document.getElementById("heartBtn").onclick = () => {
+    spawnFloatingHeart(); // Show on my screen
+    socket.send(JSON.stringify({ type: "HEART" })); // Tell partner
+};
+
+function spawnFloatingHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart-anim";
+    heart.innerHTML = "💞";
+    heart.style.left = Math.random() * 80 + 10 + "%"; // Random horizontal pos
+    heartsContainer.appendChild(heart);
+    setTimeout(() => heart.remove(), 2000);
+}

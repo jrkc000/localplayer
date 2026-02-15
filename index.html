@@ -3,58 +3,68 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Night Party</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>Date Night Sync</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div id="loginScreen" class="auth-card">
-        <h1 class="logo">NIGHT<span>PARTY</span></h1>
-        <div class="input-group">
-            <input id="roomInput" type="text" placeholder="Enter Room Code" autocomplete="off">
-            <button id="joinBtn">JOIN</button>
+
+    <div id="loginScreen" class="screen active">
+        <div class="glass-panel">
+            <h1 class="title">DATE<span>NIGHT</span></h1>
+            <p class="subtitle">Private Cinema for Two</p>
+            <div class="input-zone">
+                <input id="roomInput" type="text" placeholder="Create Room Name..." autocomplete="off">
+                <button id="joinBtn">ENTER ROOM</button>
+            </div>
         </div>
     </div>
 
-    <div id="playerScreen" class="app-interface hidden">
-        <header class="top-nav">
-            <div class="logo-small">NIGHT<span>PARTY</span></div>
-            <div class="status-indicators">
-                <span id="roomNameDisplay" class="badge">ROOM: ---</span>
-                <span id="connectionStatus" class="badge">📡 CONNECTING...</span>
-                <span id="partnerStatus" class="badge">👤 WAITING...</span>
-            </div>
-        </header>
+    <div id="playerScreen" class="screen hidden">
+        <div id="heartsContainer"></div>
 
-        <main class="content-grid">
-            <section class="video-section">
-                <div class="video-viewport">
-                    <video id="videoPlayer" controls playsinline></video>
+        <section class="video-area">
+            <div class="video-wrapper">
+                <video id="videoPlayer" controls playsinline></video>
 
-                    <div id="uploadOverlay" class="cinematic-overlay">
-                        <div class="overlay-content">
-                            <h2>Choose a movie</h2>
-                            <label class="cta-button">
-                                SELECT VIDEO FILE
-                                <input type="file" id="fileInput" accept="video/*">
-                            </label>
-                        </div>
+                <div id="uploadOverlay" class="overlay">
+                    <div class="overlay-content">
+                        <h2>Select Movie</h2>
+                        <p>Pick a local file to start</p>
+                        <label class="glow-btn">
+                            BROWSE FILES
+                            <input type="file" id="fileInput" accept="video/*">
+                        </label>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <aside class="chat-sidebar">
-                <div class="chat-header">LIVE CHAT</div>
-                <div id="chatHistory" class="chat-messages"></div>
-                <div class="chat-footer">
-                    <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
-                    <button id="sendBtn">➤</button>
-                </div>
-            </aside>
-        </main>
+            <div class="status-bar">
+                <span id="roomNameDisplay">ROOM: --</span>
+                <span id="partnerStatus" class="status-pill offline">💔 WAITING FOR PARTNER</span>
+            </div>
+        </section>
+
+        <section class="chat-area">
+            <div class="chat-header">
+                <span>WHISPER CHAT</span>
+                <button id="heartBtn" class="icon-btn">💞</button>
+            </div>
+
+            <div id="chatHistory" class="chat-history">
+                <div class="system-msg">Welcome to the room.</div>
+            </div>
+
+            <div class="chat-input-wrapper">
+                <input type="text" id="chatInput" placeholder="Say something..." autocomplete="off">
+                <button id="sendBtn">SEND</button>
+            </div>
+        </section>
     </div>
+
     <script src="app.js"></script>
 </body>
 

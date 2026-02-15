@@ -1,281 +1,373 @@
 :root {
-    --n-red: #E50914;
-    --n-dark: #050505;
-    --n-card: #141414;
-    --n-text: #FFFFFF;
-    --n-border: #333;
+    --bg-dark: #050002;
+    --primary: #D60017;
+    /* Deep Passion Red */
+    --primary-glow: #ff0044;
+    --glass: rgba(20, 20, 20, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-main: #ffffff;
+    --text-muted: #aaaaaa;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body,
 html {
     margin: 0;
     padding: 0;
-    background: var(--n-dark);
-    color: var(--n-text);
-    font-family: 'Inter', sans-serif;
+    width: 100%;
     height: 100dvh;
-    width: 100vw;
+    /* Dynamic viewport height */
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Montserrat', sans-serif;
     overflow: hidden;
+    /* Prevent body scroll */
 }
 
+/* UTILS */
 .hidden {
     display: none !important;
 }
 
-/* AUTH SCREEN */
-.auth-card {
-    height: 100%;
+/* 1. LOGIN SCREEN */
+.screen {
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bca1-0746f38e5b9a/1336423c-e547-4933-9799-a1b6c08e5e8a/US-en-20220502-popsignuptwoweeks-perspective_alpha_website_large.jpg');
-    background-size: cover;
-    background-position: center;
+    background: radial-gradient(circle at center, #1a0005 0%, #000000 100%);
+    transition: opacity 0.5s ease;
 }
 
-.logo {
-    color: var(--n-red);
-    font-size: 3.5rem;
-    font-weight: 900;
-    margin-bottom: 20px;
+.screen.active {
+    z-index: 10;
+}
+
+.glass-panel {
+    margin: auto;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    text-align: center;
+    box-shadow: 0 0 50px rgba(214, 0, 23, 0.2);
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
     letter-spacing: -2px;
+    background: linear-gradient(to right, #fff, var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.logo span {
-    color: white;
+.title span {
     font-weight: 300;
 }
 
-.input-group {
-    display: flex;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 5px;
-    border: 1px solid var(--n-border);
-    width: 350px;
-    border-radius: 4px;
+.subtitle {
+    color: var(--text-muted);
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
-.input-group input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: white;
+.input-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
     padding: 15px;
+    color: white;
+    border-radius: 8px;
     font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
 }
 
-.input-group button {
-    background: var(--n-red);
+input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(214, 0, 23, 0.3);
+}
+
+button#joinBtn {
+    background: var(--primary);
     color: white;
     border: none;
-    padding: 0 25px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 2px;
-}
-
-/* APP INTERFACE */
-.app-interface {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.top-nav {
-    height: 60px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-}
-
-.logo-small {
-    color: var(--n-red);
-    font-weight: 900;
-    font-size: 1.2rem;
-}
-
-.badge {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 5px 12px;
-    border-radius: 2px;
-    font-size: 11px;
-    font-weight: bold;
-    margin-left: 10px;
-}
-
-.content-grid {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-    padding: 10px;
-    gap: 10px;
-}
-
-/* VIDEO SECTION */
-.video-section {
-    flex: 3;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
-
-.video-viewport {
-    flex: 1;
-    background: #000;
+    padding: 15px;
+    font-weight: 800;
+    letter-spacing: 1px;
     border-radius: 8px;
-    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(214, 0, 23, 0.4);
+}
+
+/* 2. PLAYER LAYOUT (Desktop) */
+#playerScreen {
+    display: flex;
+    flex-direction: row;
+    /* Side by side on desktop */
+}
+
+.video-area {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    position: relative;
+}
+
+.video-wrapper {
+    flex: 1;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 video {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    z-index: 1;
+    max-height: 100vh;
 }
 
-.cinematic-overlay {
+.overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 10;
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(10px);
-    text-align: center;
+    z-index: 5;
 }
 
-.overlay-content h2 {
-    margin-bottom: 20px;
-    font-weight: 900;
-}
-
-.cta-button {
-    background: var(--n-red);
-    color: white;
-    padding: 12px 30px;
-    border-radius: 4px;
+.glow-btn {
+    display: inline-block;
+    background: var(--primary);
+    padding: 12px 24px;
+    border-radius: 50px;
     font-weight: bold;
     cursor: pointer;
-    border: none;
+    margin-top: 10px;
+    box-shadow: 0 0 20px var(--primary-glow);
 }
 
 input[type="file"] {
     display: none;
 }
 
-/* CHAT SIDEBAR */
-.chat-sidebar {
-    width: 350px;
-    background: var(--n-card);
-    border-radius: 8px;
-    border: 1px solid var(--n-border);
+.status-bar {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: #0a0a0a;
+    border-top: 1px solid #222;
+}
+
+.status-pill {
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.status-pill.online {
+    color: #22c55e;
+    text-shadow: 0 0 10px #22c55e;
+}
+
+.status-pill.offline {
+    color: #666;
+}
+
+/* 3. CHAT AREA */
+.chat-area {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+    background: #0a0a0a;
+    border-left: 1px solid #222;
     display: flex;
     flex-direction: column;
 }
 
 .chat-header {
     padding: 15px;
-    font-size: 11px;
-    color: #888;
-    border-bottom: 1px solid var(--n-border);
+    border-bottom: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
     letter-spacing: 1px;
+    color: var(--text-muted);
 }
 
-.chat-messages {
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.icon-btn:active {
+    transform: scale(0.8);
+}
+
+.chat-history {
     flex: 1;
     overflow-y: auto;
     padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
-.message {
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 14px;
-    max-width: 85%;
-    line-height: 1.4;
-    word-wrap: break-word;
-}
-
-.sent {
-    background: var(--n-red);
-    align-self: flex-end;
-    border-bottom-right-radius: 2px;
-}
-
-.received {
-    background: #262626;
-    align-self: flex-start;
-    border-bottom-left-radius: 2px;
-}
-
-.chat-footer {
+.chat-input-wrapper {
     padding: 15px;
+    background: #111;
     display: flex;
     gap: 10px;
-    border-top: 1px solid var(--n-border);
-    background: var(--n-card);
-    padding-bottom: calc(15px + env(safe-area-inset-bottom));
 }
 
 #chatInput {
     flex: 1;
-    background: #2b2b2b;
+    padding: 12px;
+    background: #222;
     border: none;
-    border-radius: 4px;
-    padding: 12px 15px;
+    border-radius: 20px;
     color: white;
-    font-size: 16px;
 }
 
 #sendBtn {
     background: transparent;
     border: none;
-    color: var(--n-red);
-    font-size: 20px;
+    color: var(--primary);
+    font-weight: bold;
     cursor: pointer;
 }
 
-/* MOBILE FIXES */
-@media (max-width: 850px) {
-    .content-grid {
+/* Chat Bubbles */
+.msg {
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    animation: popIn 0.2s ease;
+}
+
+.msg.me {
+    align-self: flex-end;
+    background: var(--primary);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.msg.them {
+    align-self: flex-start;
+    background: #222;
+    color: #ddd;
+    border-bottom-left-radius: 4px;
+}
+
+.system-msg {
+    align-self: center;
+    font-size: 0.75rem;
+    color: #555;
+    margin: 10px 0;
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 4. MOBILE LAYOUT (CRITICAL FIXES) */
+@media (max-width: 800px) {
+    #playerScreen {
         flex-direction: column;
-        padding: 0;
-        gap: 0;
     }
 
-    .video-section {
-        height: 35dvh;
+    .video-area {
         flex: none;
+        /* Don't grow, stick to aspect ratio */
+        height: auto;
+        max-height: 40vh;
+        /* Leave room for chat */
     }
 
-    .chat-sidebar {
-        width: 100%;
+    .video-wrapper {
+        aspect-ratio: 16/9;
+    }
+
+    .chat-area {
         flex: 1;
-        border: none;
-        border-radius: 0;
+        /* Take remaining space */
+        min-width: 100%;
+        border-left: none;
+        border-top: 1px solid #222;
+        /* Critical for scrolling */
+        min-height: 0;
     }
 
-    .top-nav {
-        padding: 0 10px;
+    .status-bar {
+        display: none;
     }
 
-    .logo-small {
-        font-size: 1rem;
+    /* Save space on mobile */
+
+    .title {
+        font-size: 2rem;
     }
 
-    .badge {
-        font-size: 9px;
-        padding: 4px 8px;
+    .glass-panel {
+        width: 90%;
+        padding: 20px;
+    }
+}
+
+/* Floating Hearts */
+.heart-anim {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    font-size: 2rem;
+    pointer-events: none;
+    animation: floatUp 2s ease-out forwards;
+    z-index: 100;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-200px) scale(1.5);
+        opacity: 0;
     }
 }
