@@ -5,114 +5,80 @@ const WebSocket = require("ws");
 
 const PORT = process.env.PORT || 3000;
 
-// ---------- HTTP SERVER ----------
+// FILE SERVER
 const server = http.createServer((req, res) => {
     let filePath = req.url === "/" ? "/index.html" : req.url;
     const fullPath = path.join(__dirname, filePath);
 
-    const types = {
-        ".html": "text/html",
-        ".js": "text/javascript",
-        ".css": "text/css",
-        ".json": "application/json",
-        ".png": "image/png",
-        ".jpg": "image/jpeg",
-        ".ico": "image/x-icon"
-    };
+    const ext = path.extname(fullPath);
+    const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css" };
 
     fs.readFile(fullPath, (err, content) => {
         if (err) {
             res.writeHead(404);
-            res.end("Not Found");
+            res.end();
         } else {
-            res.writeHead(200, {
-                "Content-Type": types[path.extname(fullPath)] || "text/plain"
-            });
+            res.writeHead(200, { "Content-Type": types[ext] || "text/plain" });
             res.end(content);
         }
     });
 });
 
-// ---------- WEBSOCKET ----------
+// WEBSOCKET LOGIC
 const wss = new WebSocket.Server({ server });
 const rooms = {};
 
-function broadcast(roomId, msg, exclude = null) {
-    if (!rooms[roomId]) return;
-    const data = JSON.stringify(msg);
-    rooms[roomId].clients.forEach(c => {
-        if (c !== exclude && c.readyState === WebSocket.OPEN) {
-            c.send(data);
-        }
-    });
-}
-
-function roomStatus(roomId) {
-    const r = rooms[roomId];
-    if (!r) return { clientCount: 0, allReady: false };
-    const allReady = [...r.clients].every(c => c.isReady);
-    return { clientCount: r.clients.size, allReady };
-}
-
 wss.on("connection", ws => {
     ws.id = Math.random().toString(36).slice(2);
-    ws.roomId = null;
-    ws.isReady = false;
 
     ws.on("message", raw => {
         const msg = JSON.parse(raw);
 
         if (msg.type === "JOIN") {
             ws.roomId = msg.roomId;
-            rooms[msg.roomId] ??= {
-                clients: new Set(),
-                state: { isPlaying: false, currentTime: 0 }
-            };
-            rooms[msg.roomId].clients.add(ws);
+            rooms[ws.roomId] ??= { clients: new Set() };
+            rooms[ws.roomId].clients.add(ws);
 
+            // Notify user of success
             ws.send(JSON.stringify({ type: "JOIN_SUCCESS", myId: ws.id }));
-            broadcast(msg.roomId, { type: "READY_UPDATE", ...roomStatus(msg.roomId) });
-            return;
+
+            // Notify room of partner count change
+            const update = JSON.stringify({
+                type: "PARTNER_UPDATE",
+                count: rooms[ws.roomId].clients.size
+            });
+            rooms[ws.roomId].clients.forEach(c => c.send(update));
         }
 
         const room = rooms[ws.roomId];
         if (!room) return;
 
-        if (msg.type === "READY") {
-            ws.isReady = true;
-            broadcast(ws.roomId, { type: "READY_UPDATE", ...roomStatus(ws.roomId) });
-        }
-
-        if (["PLAY", "PAUSE", "SEEK"].includes(msg.type)) {
-            if (msg.type === "PLAY") room.state.isPlaying = true;
-            if (msg.type === "PAUSE") room.state.isPlaying = false;
-            room.state.currentTime = msg.currentTime;
-
-            broadcast(ws.roomId, {
-                type: "SYNC",
-                isPlaying: room.state.isPlaying,
-                currentTime: room.state.currentTime,
-                timestamp: Date.now()
-            }, ws);
-        }
-
-        if (msg.type === "CHAT") {
-            broadcast(ws.roomId, {
-                type: "CHAT",
-                senderId: ws.id,
-                text: msg.text
+        // Broadcast Sync and Chat messages to everyone else in the room
+        if (msg.type === "SYNC" || msg.type === "CHAT") {
+            const data = JSON.stringify({ ...msg, senderId: ws.id });
+            room.clients.forEach(c => {
+                if (c !== ws && c.readyState === WebSocket.OPEN) {
+                    c.send(data);
+                }
             });
         }
     });
 
     ws.on("close", () => {
-        if (!ws.roomId || !rooms[ws.roomId]) return;
-        rooms[ws.roomId].clients.delete(ws);
-        broadcast(ws.roomId, { type: "READY_UPDATE", ...roomStatus(ws.roomId) });
-        if (!rooms[ws.roomId].clients.size) delete rooms[ws.roomId];
+        if (ws.roomId && rooms[ws.roomId]) {
+            rooms[ws.roomId].clients.delete(ws);
+            const update = JSON.stringify({
+                type: "PARTNER_UPDATE",
+                count: rooms[ws.roomId].clients.size
+            });
+            rooms[ws.roomId].clients.forEach(c => c.send(update));
+
+            // Cleanup empty rooms
+            if (rooms[ws.roomId].clients.size === 0) delete rooms[ws.roomId];
+        }
     });
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`✅ Night Party server listening on port ${PORT}`);
 });
